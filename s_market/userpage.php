@@ -1,56 +1,66 @@
 <?php
 session_start();
 
+/* ---------------------------
+   S-Market DB / KPI logic
+   --------------------------- */
 $servername = "localhost";
 $username = "root";
 $password = "";
-$database = "s_market";  
+$database = "s_market";
 
 $conn = mysqli_connect($servername, $username, $password, $database);
-
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Fetch Capital (unit price * total stock)
-$capitalQuery = "SELECT SUM(unit_price * product_quantity) AS total_capital FROM product";
+/* --- KPI Queries --- */
+
+// Capital = sum of stock * unit_price
+$capitalQuery = "SELECT SUM(product_quantity * unit_price) AS total_capital FROM product";
 $capitalResult = mysqli_query($conn, $capitalQuery);
 $capitalRow = mysqli_fetch_assoc($capitalResult);
 $capital = $capitalRow['total_capital'] ?? 0;
 
-// Fetch Product Sales (unit price * quantity sold)
-$productSalesQuery = "SELECT SUM(unit_price * quantity_sold) AS total_sales FROM product";
+// Product Sales = sum of total_sales
+$productSalesQuery = "SELECT SUM(total_sales) AS total_sales FROM product";
 $productSalesResult = mysqli_query($conn, $productSalesQuery);
 $productSalesRow = mysqli_fetch_assoc($productSalesResult);
 $productSales = $productSalesRow['total_sales'] ?? 0;
 
-// Fetch Profit (sales - capital)
-$profitQuery = "SELECT SUM((unit_price * quantity_sold) - (unit_price * product_quantity)) AS total_profit FROM product";
+// Profit = sum of (total_sales - (quantity_sold * unit_price))
+$profitQuery = "SELECT SUM(total_sales - (quantity_sold * unit_price)) AS total_profit FROM product";
 $profitResult = mysqli_query($conn, $profitQuery);
 $profitRow = mysqli_fetch_assoc($profitResult);
 $profit = $profitRow['total_profit'] ?? 0;
 
-// Fetch Capital Loss (unsold stock value)
-$capitalLossQuery = "SELECT SUM((product_quantity - quantity_sold) * unit_price) AS total_loss 
-                     FROM product WHERE quantity_sold < product_quantity";
+// Capital Loss (if any product was sold below cost) → this assumes total_sales < (quantity_sold*unit_price)
+$capitalLossQuery = "
+    SELECT SUM((quantity_sold * unit_price) - total_sales) AS total_loss 
+    FROM product 
+    WHERE total_sales < (quantity_sold * unit_price)";
 $resultLoss = mysqli_query($conn, $capitalLossQuery);
 $rowLoss = mysqli_fetch_assoc($resultLoss);
 $capitalLoss = $rowLoss['total_loss'] ?? 0;
 
-// Save Product
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+/* ---------------------------
+   Handle Product Insertion
+   --------------------------- */
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $branch = mysqli_real_escape_string($conn, $_POST['branch']);
-    $product_type = mysqli_real_escape_string($conn, $_POST['productType']);
-    $product_name = mysqli_real_escape_string($conn, $_POST['productName']);
-    $product_quantity = intval($_POST['productQuantity']);
-    $quantity_sold = intval($_POST['quantitySold']);
-    $unit_price = floatval($_POST['unitPrice']);
-    $total_sales = $quantity_sold * $unit_price;
-    $date_of_sales = mysqli_real_escape_string($conn, $_POST['saleDate']);
-    $month_of_sales = mysqli_real_escape_string($conn, $_POST['saleMonth']);
+    $productType = mysqli_real_escape_string($conn, $_POST['product_type']);
+    $productName = mysqli_real_escape_string($conn, $_POST['product_name']);
+    $quantity = intval($_POST['product_quantity']);
+    $sold = intval($_POST['quantity_sold']);
+    $unitPrice = floatval($_POST['unit_price']);
+    $totalSales = floatval($_POST['total_sales']);
+    $dateOfSale = mysqli_real_escape_string($conn, $_POST['date_of_sale']);
+    $monthOfSale = mysqli_real_escape_string($conn, $_POST['month_of_sale']);
 
-    $sql = "INSERT INTO product (branch, product_type, product_name, product_quantity, quantity_sold, unit_price, total_sales, date_of_sales, month_of_sales) 
-            VALUES ('$branch', '$product_type', '$product_name', $product_quantity, $quantity_sold, $unit_price, $total_sales, '$date_of_sales', '$month_of_sales')";
+    $sql = "INSERT INTO product 
+        (branch, product_type, product_name, product_quantity, quantity_sold, unit_price, total_sales, date_of_sale, month_of_sale) 
+        VALUES 
+        ('$branch', '$productType', '$productName', $quantity, $sold, $unitPrice, $totalSales, '$dateOfSale', '$monthOfSale')";
 
     if (mysqli_query($conn, $sql)) {
         $_SESSION['success'] = "✅ Product successfully added!";
@@ -58,11 +68,82 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['error'] = "❌ Error: " . mysqli_error($conn);
     }
 
-    header("Location: ".$_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
 
+/* Flash messages */
+if (isset($_SESSION['success'])) {
+    echo "<script>alert('" . addslashes($_SESSION['success']) . "');</script>";
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    echo "<script>alert('" . addslashes($_SESSION['error']) . "');</script>";
+    unset($_SESSION['error']);
+}
+
 mysqli_close($conn);
+
+
+/* ---------------------------
+   Mama Coco analytics data
+   --------------------------- */
+$branches = [
+    'All Branches',
+    'CTA Zandueta',
+    'DM Foodmart',
+    'CTA Camp 7',
+    'BGH - OPD'
+];
+
+$months = [
+    'August 2025',
+    'July 2025',
+    'June 2025',
+    'May 2025',
+    'April 2025',
+    'March 2025'
+];
+
+$branchAnalytics = [
+    'CTA Zandueta' => ['sales' => 285000, 'profit' => 95000, 'customers' => 1250, 'growth' => 12.5],
+    'DM Foodmart'  => ['sales' => 320000, 'profit' => 112000, 'customers' => 1450, 'growth' => 8.3],
+    'CTA Camp 7'   => ['sales' => 195000, 'profit' => 68000, 'customers' => 890, 'growth' => 15.2],
+    'BGH - OPD'    => ['sales' => 410000, 'profit' => 145000, 'customers' => 1890, 'growth' => 6.7]
+];
+
+$monthlySalesData = [
+    ['month' => 'Mar', 'CTA Zandueta' => 260000, 'DM Foodmart' => 295000, 'CTA Camp 7' => 180000, 'BGH - OPD' => 385000],
+    ['month' => 'Apr', 'CTA Zandueta' => 275000, 'DM Foodmart' => 310000, 'CTA Camp 7' => 185000, 'BGH - OPD' => 395000],
+    ['month' => 'May', 'CTA Zandueta' => 280000, 'DM Foodmart' => 315000, 'CTA Camp 7' => 190000, 'BGH - OPD' => 405000],
+    ['month' => 'Jun', 'CTA Zandueta' => 285000, 'DM Foodmart' => 318000, 'CTA Camp 7' => 192000, 'BGH - OPD' => 408000],
+    ['month' => 'Jul', 'CTA Zandueta' => 282000, 'DM Foodmart' => 320000, 'CTA Camp 7' => 194000, 'BGH - OPD' => 410000],
+    ['month' => 'Aug', 'CTA Zandueta' => 285000, 'DM Foodmart' => 320000, 'CTA Camp 7' => 195000, 'BGH - OPD' => 410000]
+];
+
+$monthlyProfitData = [
+    ['month' => 'Mar', 'CTA Zandueta' => 88000, 'DM Foodmart' => 103000, 'CTA Camp 7' => 63000, 'BGH - OPD' => 135000],
+    ['month' => 'Apr', 'CTA Zandueta' => 92000, 'DM Foodmart' => 108000, 'CTA Camp 7' => 65000, 'BGH - OPD' => 138000],
+    ['month' => 'May', 'CTA Zandueta' => 94000, 'DM Foodmart' => 110000, 'CTA Camp 7' => 67000, 'BGH - OPD' => 142000],
+    ['month' => 'Jun', 'CTA Zandueta' => 95000, 'DM Foodmart' => 111000, 'CTA Camp 7' => 67500, 'BGH - OPD' => 143000],
+    ['month' => 'Jul', 'CTA Zandueta' => 94500, 'DM Foodmart' => 112000, 'CTA Camp 7' => 68000, 'BGH - OPD' => 144000],
+    ['month' => 'Aug', 'CTA Zandueta' => 95000, 'DM Foodmart' => 112000, 'CTA Camp 7' => 68000, 'BGH - OPD' => 145000]
+];
+
+// Selected filters (safe defaults)
+$selectedBranch = isset($_GET['branch']) ? $_GET['branch'] : 'All Branches';
+$selectedMonth  = isset($_GET['month']) ? $_GET['month'] : 'August 2025';
+
+// Helper
+function formatCurrency($amount) {
+    return '₱' . number_format((float)$amount, 0, '.', ',');
+}
+
+// Totals (computed from the arrays so they exist)
+$totalSales = array_sum(array_column($branchAnalytics, 'sales'));
+$totalProfit = array_sum(array_column($branchAnalytics, 'profit'));
+$totalBranches = max(0, count($branches) - 1);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,118 +151,27 @@ mysqli_close($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-Market - AI Marketing Decision Modeling System</title>
+
+    <!-- Your existing styles -->
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="Profile.css">
     <link rel="stylesheet" href="upload.css">
+
+    <!-- Mama Coco styles (keeps the analytics look consistent) -->
+    <link rel="stylesheet" href="maco.css">
+
+    <!-- Font Awesome (kept) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-
     <style>
-    body {
-        font-family: "Segoe UI", sans-serif;
-        background-color: #f4f6f9;
-        color: #003366;
-        margin: 0;
-        padding: 0;
-    }
-
-    .product-form-container {
-        max-width: 700px;
-        margin: 50px auto;
-        padding: 30px;
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    }
-
-    .product-form-container h3 {
-        margin-bottom: 25px;
-        color: #0055aa;
-        text-align: center;
-        font-size: 1.8rem;
-    }
-
-    .product-form-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
-    }
-
-    .product-form-group label {
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: #0055aa;
-    }
-
-    .product-form-group input,
-    .product-form-group select {
-        padding: 12px;
-        border: 1px solid #007bff;
-        border-radius: 6px;
-        font-size: 1rem;
-        outline: none;
-        transition: 0.3s border-color, 0.3s background-color;
-    }
-
-    .product-form-group input:focus,
-    .product-form-group select:focus {
-        border-color: #003366;
-        background-color: #e6f0ff;
-    }
-
-    .product-form-row {
-        display: flex;
-        gap: 20px;
-    }
-
-    .product-form-row .product-form-group {
-        flex: 1;
-    }
-
-    .form-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        margin-top: 25px;
-    }
-
-    .btn {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1rem;
-        color: #fff;
-        transition: 0.3s background-color;
-    }
-
-    .btn-save {
-        background-color: #007bff;
-    }
-
-    .btn-save:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-cancel {
-        background-color: #dc3545;
-    }
-
-    .btn-cancel:hover {
-        background-color: #b30000;
-    }
-
-    @media (max-width: 768px) {
-        .product-form-row {
-            flex-direction: column;
-        }
-    }
-</style>
+        /* Tiny spacing fix so the analytics section sits nicely under metric cards */
+        .analytics-section { margin-top: 1.25rem; }
+        .chart-container { height: 260px; }
+    </style>
 </head>
 <body>
 
 <div class="container">
 
-    <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
             <img src="logo.png" alt="S-Market Logo">
@@ -193,20 +183,42 @@ mysqli_close($conn);
             <li class="nav-item"><a href="analyticsnav.php"><i class="fas fa-chart-bar"></i> Analytics</a></li>
             <li class="nav-item"><a href="AiRecnav.php"><i class="fas fa-lightbulb"></i> AI Recommendations</a></li>
             <li class="nav-item"><i class="fas fa-bullhorn"></i> Marketing</li>
-            <li class="nav-item"><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+            <li class="nav-item"><i class="fas fa-cog"></i> Settings</li>
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="header">
+            <!-- Search Bar -->
             <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search products, or reports...">
             </div>
+
+            <!-- Profile Menu -->
+            <div class="profile-menu" id="profileMenu">
+                <div class="profile-toggle">
+                    <img src="Avatar.png" alt="User Avatar" class="avatar">
+                    <span class="username">Jhon James</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown" id="profileDropdown">
+                    <div class="profile-info">
+                        <img src="Avatar.png" alt="User Avatar" class="avatar">
+                        <div>
+                            <strong>Jhon James</strong>
+                            <p class="email">jhon@example.com</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <a href="profile.php"><i class="fas fa-id-card"></i> View Profile</a>
+                    <a href="settings.php"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
         </div>
 
-        <!-- Metrics -->
+        <!-- KPI metric cards -->
         <div class="dashboard-grid">
             <div class="metric-card">
                 <div class="title">Capital</div>
@@ -226,122 +238,222 @@ mysqli_close($conn);
             </div>
         </div>
 
-        <!-- Upload & Modal Trigger -->
-        <div class="upload-content">
-            <div class="file-upload">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>Drag and drop your CSV file here or click to browse</p>
-                <button class="btn btn-primary">Choose File</button>
-            </div>
-            <div class="action-buttons">
-                <button id="uploadBtn" class="btn btn-primary">Upload Products</button>
+        <!-- ======= Branch Analytics Container ======= -->
+<div class="branch-analytics-container">
+    <!-- Header row -->
+    <div class="branch-analytics-header">
+        <h1 class="section-title">
+            <i data-lucide="activity" class="icon"></i>
+            Branch Analytics Overview
+        </h1>
+        <div class="filters">
+            <div class="select-wrapper">
+                <select id="branchSelect">
+                    <option>All Branches</option>
+                    <option>CTA Zandueta</option>
+                    <option>DM Foodmart</option>
+                    <option>CTA Camp 7</option>
+                    <option>BGH - OPD</option>
+                </select>
             </div>
         </div>
+    </div>
 
-        <!-- Modal -->
-        <div id="productModal" class="modal">
-            <div class="modal-content">
-                <span class="closeBtn">&times;</span>
-                <div class="product-form-container">
-                    <h3>Add Product Details</h3>
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" oninput="calculateTotal()">
-                        <div class="product-form-group">
-                            <label for="branch">Branch*</label>
-                            <select id="branch" name="branch" required>
-                                <option value="">Select Branch</option>
-                                <option value="CTA Zandueta">CTA Zandueta</option>
-                                <option value="DM Foodmart">DM Foodmart</option>
-                                <option value="CTA Camp 7">CTA Camp 7</option>
-                                <option value="BGH - OPD">BGH - OPD</option>
-                            </select>
-                        </div>
+    <!-- Branch Cards -->
+<div class="branch-cards">
+    <?php foreach ($branchAnalytics as $branchName => $data): 
+        // Ensure values exist and are numeric
+        $sales = isset($data['sales']) ? (float)$data['sales'] : 0;
+        $profit = isset($data['profit']) ? (float)$data['profit'] : 0;
 
-                        <div class="product-form-group">
-                            <label for="productType">Product Type*</label>
-                            <select id="productType" name="productType" required>
-                                <option value="">Select Product Type</option>
-                                <option value="Small Tub">Small Tub</option>
-                                <option value="Big Tub">Big Tub</option>
-                            </select>
-                        </div>
+        // Dynamic dot logic:
+        // - negative profit => red
+        // - high sales => green (>= 350k)
+        // - medium sales => yellow (>= 250k)
+        // - otherwise => orange
+        if ($profit < 0) {
+            $dotClass = 'red';
+        } elseif ($sales >= 350000) {
+            $dotClass = 'green';
+        } elseif ($sales >= 250000) {
+            $dotClass = 'yellow';
+        } else {
+            $dotClass = 'orange';
+        }
 
-                        <div class="product-form-group">
-                            <label for="productName">Product Name*</label>
-                            <input type="text" id="productName" name="productName" placeholder="Enter product name" required>
-                        </div>
+        // Profit class for value color
+        $profitClass = ($profit < 0) ? 'negative' : 'positive';
+    ?>
+        <div class="branch-card">
+            <div class="branch-card-header">
+                <div class="branch-name"><?= htmlspecialchars($branchName) ?></div>
+                <div class="branch-color <?= $dotClass ?>" title="<?= htmlspecialchars(ucfirst($dotClass)) ?>"></div>
+            </div>
 
-                        <div class="product-form-group">
-                            <label for="productQuantity">Quantity of Product*</label>
-                            <input type="number" id="productQuantity" name="productQuantity" min="0" placeholder="0" required>
-                        </div>
-
-                        <div class="product-form-row">
-                            <div class="product-form-group">
-                                <label for="quantitySold">Quantity Sold*</label>
-                                <input type="number" id="quantitySold" name="quantitySold" min="0" placeholder="0" required>
-                            </div>
-                            <div class="product-form-group">
-                                <label for="unitPrice">Unit Price*</label>
-                                <input type="number" id="unitPrice" name="unitPrice" step="0.01" placeholder="0.00" required>
-                            </div>
-                        </div>
-
-                        <div class="product-form-group">
-                            <label for="totalSales">Total Sales</label>
-                            <input type="number" id="totalSales" name="totalSales" step="0.01" placeholder="0.00" readonly>
-                        </div>
-
-                        <div class="product-form-group">
-                            <label for="saleDate">Date of Sale*</label>
-                            <input type="date" id="saleDate" name="saleDate" required onchange="updateMonth()">
-                        </div>
-
-                        <div class="product-form-group">
-                            <label for="saleMonth">Month of Sale</label>
-                            <input type="text" id="saleMonth" name="saleMonth" readonly>
-                        </div>
-
-                        <div class="form-buttons">
-                            <button type="submit" class="btn btn-save">Save Product</button>
-                            <button type="button" class="btn btn-cancel" onclick="window.location.href='productnav.php'">Cancel</button>
-                        </div>
-                    </form>
+            <div class="branch-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Sales</span>
+                    <span class="stat-value"><?= formatCurrency($sales) ?></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Profit</span>
+                    <span class="stat-value <?= $profitClass ?>"><?= formatCurrency($profit) ?></span>
                 </div>
             </div>
         </div>
+    <?php endforeach; ?>
+</div>
 
+
+
+
+
+<!-- Sales Report (separate container) -->
+<div class="sales-report-container">
+    <div class="chart-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 class="section-title"><i data-lucide="calendar" class="icon"></i> Sales Report</h2>
+        <div class="select-wrapper">
+            <select id="monthSelect" onchange="updateFilters()">
+                <?php foreach ($months as $m): ?>
+                    <option value="<?= htmlspecialchars($m) ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($m) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <div class="report-charts">
+        <div class="chart-block">
+            <h3 class="chart-title">Sales per Month by Branch</h3>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-block">
+            <h3 class="chart-title">Monthly Gross Profit per Branch</h3>
+            <div class="chart-container">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Existing JS files -->
+<script src="upload.js"></script>
+<script src="Profile.js"></script>
+
+<!-- Chart.js and Lucide icon pack (only once) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/lucide.min.js"></script>
+
 <script>
-function calculateTotal() {
-    const quantity = parseFloat(document.getElementById('quantitySold').value) || 0;
-    const price = parseFloat(document.getElementById('unitPrice').value) || 0;
-    document.getElementById('totalSales').value = (quantity * price).toFixed(2);
-}
+document.addEventListener('DOMContentLoaded', function () {
+    // lucide icons
+    if (window.lucide) lucide.createIcons();
 
-function updateMonth() {
-    const date = document.getElementById('saleDate').value;
-    if (date) {
-        const monthNames = [
-            "January","February","March","April","May","June",
-            "July","August","September","October","November","December"
-        ];
-        const d = new Date(date);
-        document.getElementById('saleMonth').value = monthNames[d.getMonth()] + " " + d.getFullYear();
-    } else {
-        document.getElementById('saleMonth').value = '';
+    // Data from PHP
+    const monthlySalesData = <?php echo json_encode($monthlySalesData); ?>;
+    const monthlyProfitData = <?php echo json_encode($monthlyProfitData); ?>;
+    const branchNames = <?php echo json_encode(array_keys($branchAnalytics)); ?>;
+    const colors = [
+    getComputedStyle(document.documentElement).getPropertyValue('--chart-blue').trim(),
+    getComputedStyle(document.documentElement).getPropertyValue('--chart-green').trim(),
+    getComputedStyle(document.documentElement).getPropertyValue('--chart-orange').trim(),
+    getComputedStyle(document.documentElement).getPropertyValue('--chart-indigo').trim()
+];
+
+
+    // Sales chart (stacked bar per branch over months)
+    const salesCanvas = document.getElementById('salesChart');
+    if (salesCanvas && window.Chart) {
+        const salesCtx = salesCanvas.getContext('2d');
+        const salesChart = new Chart(salesCtx, {
+            type: 'bar',
+            data: {
+                labels: monthlySalesData.map(item => item.month),
+                datasets: branchNames.map((branch, index) => ({
+                    label: branch,
+                    data: monthlySalesData.map(item => item[branch] || 0),
+                    backgroundColor: colors[index % colors.length],
+                    borderRadius: 4
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '₱' + (value / 1000) + 'K'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.dataset.label + ': ₱' + ctx.parsed.y.toLocaleString()
+                        }
+                    },
+                    legend: { position: 'top' }
+                }
+            }
+        });
     }
+
+    // Profit chart (line)
+    const profitCanvas = document.getElementById('profitChart');
+    if (profitCanvas && window.Chart) {
+        const profitCtx = profitCanvas.getContext('2d');
+        const profitChart = new Chart(profitCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyProfitData.map(item => item.month),
+                datasets: branchNames.map((branch, index) => ({
+                    label: branch,
+                    data: monthlyProfitData.map(item => item[branch] || 0),
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length] + '33',
+                    tension: 0.35,
+                    pointRadius: 4,
+                    fill: false
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '₱' + (value / 1000) + 'K'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.dataset.label + ': ₱' + ctx.parsed.y.toLocaleString()
+                        }
+                    },
+                    legend: { position: 'top' }
+                }
+            }
+        });
+    }
+});
+
+// updateFilters (keeps behavior simple)
+function updateFilters() {
+    const branch = document.getElementById('branchSelect') ? document.getElementById('branchSelect').value : '';
+    const month  = document.getElementById('monthSelect') ? document.getElementById('monthSelect').value : '';
+    const url = new URL(window.location.href);
+    if (branch) url.searchParams.set('branch', branch);
+    if (month) url.searchParams.set('month', month);
+    window.location.href = url.toString();
 }
-
-// Modal handling
-const modal = document.getElementById('productModal');
-const btn = document.getElementById('uploadBtn');
-const closeBtn = document.querySelector('.closeBtn');
-
-btn.addEventListener('click', () => { modal.style.display = 'block'; });
-closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-window.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
 </script>
 
 </body>

@@ -1,0 +1,219 @@
+/* =========================
+   Global Variables
+========================= */
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --success: #10b981;
+    --accent: #e74c3c;
+    --warning: #f59e0b;
+    --dark: #111827;
+    --text: #374151;
+    --border-radius: 8px;
+    --shadow: 0 2px 6px rgba(0,0,0,0.05);
+
+    /* Chart Colors */
+    --chart-blue: #3b82f6;   /* Sales */
+    --chart-green: #10b981;  /* Profit */
+    --chart-orange: #f59e0b; /* Loss */
+    --chart-indigo: #6366f1; /* Accent */
+}
+
+/* =========================
+   General Analytics Section
+========================= */
+.analytics-section {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: transparent; /* keep S-Market's body bg */
+    color: var(--text);
+    padding: 2rem 0;
+}
+
+/* Section Header */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+/* Dropdown Filters */
+.filters {
+    display: flex;
+    gap: 1rem;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+select {
+    appearance: none;
+    background: white;
+    border: 1px solid var(--secondary);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 2rem 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+    color: var(--dark);
+}
+
+select:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.select-wrapper::after {
+    content: '▼';
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #999;
+    font-size: 0.75rem;
+}
+
+/* =========================
+   Branch Analytics Section
+========================= */
+.branch-analytics-container {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.branch-analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Branch Cards Grid */
+.branch-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Branch Card */
+.branch-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.branch-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.branch-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.branch-name {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+/* Dynamic Branch Dots */
+.branch-color {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+}
+
+.branch-color.green   { background: var(--success); }   /* High Sales/Profit */
+.branch-color.yellow  { background: var(--warning); }   /* Medium */
+.branch-color.orange  { background: #ff7b54; }          /* Low */
+.branch-color.red     { background: var(--accent); }    /* Negative Profit */
+
+/* Stats */
+.branch-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.stat-label {
+    color: #666;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.stat-value.positive { color: var(--success); }
+.stat-value.negative { color: var(--accent); }
+
+/* =========================
+   Sales Report Section
+========================= */
+.sales-report-container {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.chart-header {
+    margin-bottom: 1rem;
+}
+
+.chart-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.report-charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.chart-container {
+    height: 280px;
+}
+
+/* Responsive for Sales Charts */
+@media (min-width: 1024px) {
+    .report-charts {
+        grid-template-columns: 1fr 1fr;
+    }
+}
