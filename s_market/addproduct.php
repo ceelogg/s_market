@@ -13,7 +13,7 @@ if (!$conn) {
 }
 
 // edit lang
-
+// MIC TEST
 // Save Product
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $branch = mysqli_real_escape_string($conn, $_POST['branch']);
