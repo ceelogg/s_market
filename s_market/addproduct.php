@@ -12,6 +12,7 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+/*test */
 // Save Product
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $branch = mysqli_real_escape_string($conn, $_POST['branch']);
