@@ -165,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <option value="DM Foodmart">DM Foodmart</option>
                 <option value="CTA Camp 7">CTA Camp 7</option>
                 <option value="BGH - OPD">BGH - OPD</option>
-                <option value="BGH - OPD">try</option>
+            
             </select>
         </div>
 
