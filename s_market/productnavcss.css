@@ -1,0 +1,211 @@
+/* ===== Product Inventory Section ===== */
+.products-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.products-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Filter Form */
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.filter-form label {
+    font-weight: 500;
+    color: #444;
+}
+
+.filter-form select,
+.filter-form input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filter-form button {
+    background: #4CAF50;
+    border: none;
+    color: #fff;
+    padding: 7px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+
+.filter-form button:hover {
+    background: #43a047;
+}
+
+.filter-form a button {
+    background: #f44336;
+}
+
+.filter-form a button:hover {
+    background: #d32f2f;
+}
+
+/* ===== Product Table ===== */
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.products-table thead {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.products-table th, 
+.products-table td {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.products-table tr:hover {
+    background: #f9f9f9;
+}
+
+/* Currency styling */
+.products-table td:nth-child(6),
+.products-table td:nth-child(7) {
+    font-weight: 600;
+    color: #2e7d32;
+}
+
+/* ===== Action Buttons ===== */
+.action-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 6px;
+    margin: 0 2px;
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+.edit-btn {
+    color: #2196F3;
+}
+
+.edit-btn:hover {
+    background: rgba(33,150,243,0.1);
+}
+
+.delete-btn {
+    color: #f44336;
+}
+
+.delete-btn:hover {
+    background: rgba(244,67,54,0.1);
+}
+
+/* ===== Modal ===== */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%;
+    overflow: auto; 
+    background: rgba(0,0,0,0.4); 
+}
+
+.modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #444;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.btn-container {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 7px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 5px;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #43a047;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* Close button */
+.close {
+    float: right;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover {
+    color: red;
+}

@@ -1,0 +1,193 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Light Mode */
+body.light {
+    background: #f8f9fb;
+    color: #000; /* text black */
+}
+
+/* Dark Mode */
+body.dark {
+    background: #001f3f; /* ✅ dark blue background */
+    color: #fff;         /* ✅ white text */
+}
+
+.settings-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Main Settings */
+.settings-main {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.settings-main h2 {
+    margin-bottom: 20px;
+    color: inherit; /* inherit from body (black in light / white in dark) */
+}
+
+/* Cards */
+.card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    color: #000;
+}
+
+body.dark .card {
+    background: #2c3e50; /* ✅ darker blue card */
+    color: #fff;         /* ✅ white text in dark mode */
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    color: inherit; /* adapt text color */
+}
+
+form label {
+    margin: 10px 0 5px;
+    font-weight: 500;
+    color: inherit;
+}
+
+form input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    color: #000; /* always black text inside inputs */
+}
+
+body.dark form input {
+    background: #002244; /* ✅ darker input background */
+    border: 1px solid #555;
+    color: #fff; /* ✅ white input text */
+}
+
+/* Buttons */
+form button,
+.profile-form button {
+    background: #0056b3;       /* blue background */
+    color: #fff;               /* white text */
+    border: 1px solid #0056b3; /* blue border */
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease;
+}
+
+form button:hover,
+.profile-form button:hover {
+    background: #0056b3;
+    border: 1px solid #0056b3;
+    color: #fff;
+}
+
+/* Password Rules */
+.rules-box {
+    margin-top: 15px;
+    font-size: 14px;
+    color: inherit;
+}
+
+.rules-box ul {
+    margin-left: 20px;
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    border-radius: 25px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 3.5px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+    background-color: #007bff;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Profile Settings */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+}
+
+.profile-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.profile-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid #ddd;
+}
+
+.profile-form input[type="file"] {
+    margin-top: 5px;
+    font-size: 14px;
+    color: inherit;
+}
+
+.profile-form input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin: 10px 0;
+    color: #000;
+}
+
+body.dark .profile-form input[type="text"] {
+    background: #002244;
+    border: 1px solid #555;
+    color: #fff;
+}
