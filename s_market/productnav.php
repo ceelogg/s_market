@@ -86,12 +86,20 @@ $startDate = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $endDate = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 
 // ==============================
+// Pagination Setup
+// ==============================
+$records_per_page = 10; // Number of records per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $records_per_page;
+
+// ==============================
 // Summary Cards Data
 // ==============================
 $summary_sql = "SELECT 
     COUNT(*) AS total_products,
     SUM(total_sales) AS total_sales,
-    SUM(quantity_sold) AS items_sold,
+    SUM(quantity_sold) AS items_sold
     FROM product WHERE 1=1";
 
 // Apply same filters
@@ -103,13 +111,15 @@ if (!empty($startDate) && !empty($endDate)) {
                       AND '" . mysqli_real_escape_string($conn, $endDate) . "'";
 }
 
+$summary_result = mysqli_query($conn, $summary_sql);
+$summary = mysqli_fetch_assoc($summary_result);
 
 $total_products = $summary['total_products'] ?? 0;
 $total_sales = $summary['total_sales'] ?? 0;
 $items_sold = $summary['items_sold'] ?? 0;
 
 // ==============================
-// Product Table Query
+// Product Table Query with Pagination
 // ==============================
 $sql = "SELECT * FROM product WHERE 1=1";
 
@@ -124,6 +134,13 @@ if (!empty($startDate) && !empty($endDate)) {
               AND '" . mysqli_real_escape_string($conn, $endDate) . "'";
 }
 
+// Get total count for pagination
+$count_result = mysqli_query($conn, $sql);
+$total_records = mysqli_num_rows($count_result);
+$total_pages = ceil($total_records / $records_per_page);
+
+// Add pagination to main query
+$sql .= " LIMIT $offset, $records_per_page";
 $result = mysqli_query($conn, $sql);
 
 // ==============================
@@ -174,8 +191,6 @@ if (isset($_GET['export_csv'])) {
         
         <!-- Main Content Area -->
         <div class="main-content">
-
-            
 
             <!-- Active Filters Info -->
             <div class="filter-info">
@@ -257,6 +272,46 @@ if (isset($_GET['export_csv'])) {
                     </tbody>
                 </table>
 
+                <!-- Pagination -->
+                <?php if ($total_pages > 1): ?>
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        Showing <?= min($offset + 1, $total_records) ?> - <?= min($offset + $records_per_page, $total_records) ?> of <?= $total_records ?> products
+                    </div>
+                    <div class="pagination">
+                        <?php if ($page > 1): ?>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>" class="page-btn first-page" title="First Page">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>" class="page-btn prev-page" title="Previous Page">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php
+                        // Show page numbers
+                        $start_page = max(1, $page - 2);
+                        $end_page = min($total_pages, $page + 2);
+                        
+                        for ($i = $start_page; $i <= $end_page; $i++):
+                        ?>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>" class="page-btn <?= $i == $page ? 'active' : '' ?>">
+                                <?= $i ?>
+                            </a>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $total_pages): ?>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>" class="page-btn next-page" title="Next Page">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $total_pages])) ?>" class="page-btn last-page" title="Last Page">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- Floating Add Product Button -->
                 <div class="add-product-btn">
                     <button type="button" onclick="openAddModal()">
@@ -312,7 +367,7 @@ if (isset($_GET['export_csv'])) {
                 </div>
                 <div class="form-group">
                     <label for="edit_month_of_sale">Month of Sales</label>
-                    <input type="text" id="edit_month_of_sale" name="month_of_sale" required>
+                    <input type="text" id="edit_month_of_sale" name="month_of_sale" readonly required>
                 </div>
 
                 <div class="btn-container">
@@ -323,76 +378,8 @@ if (isset($_GET['export_csv'])) {
         </div>
     </div>
 
-    <script>
-    // Modal functions
-    function openAddModal() {
-        const modal = document.getElementById("editModal");
-        const modalTitle = document.getElementById("modalTitle");
-        const form = document.getElementById("editProductForm");
-        const submitBtn = document.getElementById("modalSubmitBtn");
-        
-        if (!modal || !modalTitle || !form || !submitBtn) {
-            console.error("Modal elements not found!");
-            return;
-        }
-        
-        form.reset();
-        document.getElementById("edit_id").value = "";
-        
-        modalTitle.textContent = "Add New Product";
-        submitBtn.name = "add_product";
-        submitBtn.textContent = "Add Product";
-        modal.style.display = "block";
-    }
-
-    function editProduct(product) {
-        const modal = document.getElementById("editModal");
-        const modalTitle = document.getElementById("modalTitle");
-        const submitBtn = document.getElementById("modalSubmitBtn");
-        
-        if (!modal || !modalTitle || !submitBtn) {
-            console.error("Modal elements not found!");
-            return;
-        }
-        
-        const setValue = (id, value) => {
-            const element = document.getElementById(id);
-            if (element) element.value = value;
-        };
-        
-        setValue("edit_id", product.id);
-        setValue("edit_branch", product.branch);
-        setValue("edit_product_type", product.product_type);
-        setValue("edit_product_name", product.product_name);
-        setValue("edit_quantity_sold", product.quantity_sold);
-        setValue("edit_unit_price", product.unit_price);
-        setValue("edit_date_of_sale", product.date_of_sale);
-        setValue("edit_month_of_sale", product.month_of_sale);
-        
-        modalTitle.textContent = "Edit Product";
-        submitBtn.name = "update_product";
-        submitBtn.textContent = "Save Changes";
-        modal.style.display = "block";
-    }
-
-    function closeModal() {
-        const modal = document.getElementById("editModal");
-        if (modal) modal.style.display = "none";
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById("editModal");
-        if (modal && event.target == modal) {
-            closeModal();
-        }
-    }
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') closeModal();
-    });
-    </script>
+    <!-- Include the external JavaScript file -->
+    <script src="productnav.js"></script>
 
 </body>
 </html>
