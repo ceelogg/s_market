@@ -432,31 +432,128 @@ body {
     color: #333;
 }
 
-/* ===== PAGINATION (if needed later) ===== */
-.table-footer {
+/* ===== PAGINATION STYLES ===== */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
-    text-align: center;
+    padding: 15px 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
 }
 
 .pagination {
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    gap: 5px;
+    align-items: center;
 }
 
 .page-btn {
-    padding: 8px 16px;
-    background-color: var(--secondary);
-    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    color: #495057;
     text-decoration: none;
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 40px;
+    height: 40px;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .page-btn:hover {
-    background-color: var(--primary);
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
 }
 
 .page-btn.active {
-    background-color: var(--dark);
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.page-btn:disabled,
+.page-btn.disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.page-btn:disabled:hover,
+.page-btn.disabled:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    transform: none;
+}
+
+.page-btn i {
+    font-size: 12px;
+}
+
+/* First and last page buttons */
+.page-btn.first-page,
+.page-btn.last-page {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
+
+.page-btn.prev-page,
+.page-btn.next-page {
+    background-color: #f1f3f4;
+}
+
+/* Responsive pagination */
+@media (max-width: 768px) {
+    .pagination-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .page-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+
+/* Loading state for pagination */
+.pagination.loading .page-btn {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Animation for page transitions */
+.products-table tbody tr {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
