@@ -17,7 +17,7 @@ if (!$conn) {
 /* --- KPI Queries --- */
 
 // Capital = sum of stock * unit_price
-$capitalQuery = "SELECT SUM(product_quantity * unit_price) AS total_capital FROM product";
+$capitalQuery = "SELECT SUM(quantity_sold * unit_price) AS total_capital FROM product";
 $capitalResult = mysqli_query($conn, $capitalQuery);
 $capitalRow = mysqli_fetch_assoc($capitalResult);
 $capital = $capitalRow['total_capital'] ?? 0;
@@ -50,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $branch = mysqli_real_escape_string($conn, $_POST['branch']);
     $productType = mysqli_real_escape_string($conn, $_POST['product_type']);
     $productName = mysqli_real_escape_string($conn, $_POST['product_name']);
-    $quantity = intval($_POST['product_quantity']);
     $sold = intval($_POST['quantity_sold']);
     $unitPrice = floatval($_POST['unit_price']);
     $totalSales = floatval($_POST['total_sales']);
@@ -58,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $monthOfSale = mysqli_real_escape_string($conn, $_POST['month_of_sale']);
 
     $sql = "INSERT INTO product 
-        (branch, product_type, product_name, product_quantity, quantity_sold, unit_price, total_sales, date_of_sale, month_of_sale) 
+        (branch, product_type, product_name, quantity_sold, unit_price, total_sales, date_of_sale, month_of_sale) 
         VALUES 
         ('$branch', '$productType', '$productName', $quantity, $sold, $unitPrice, $totalSales, '$dateOfSale', '$monthOfSale')";
 
@@ -131,7 +130,6 @@ $monthlyProfitData = [
 ];
 
 // Selected filters (safe defaults)
-$selectedBranch = isset($_GET['branch']) ? $_GET['branch'] : 'All Branches';
 $selectedMonth  = isset($_GET['month']) ? $_GET['month'] : 'August 2025';
 
 // Helper
@@ -246,17 +244,6 @@ $totalBranches = max(0, count($branches) - 1);
             <i data-lucide="activity" class="icon"></i>
             Branch Analytics Overview
         </h1>
-        <div class="filters">
-            <div class="select-wrapper">
-                <select id="branchSelect">
-                    <option>All Branches</option>
-                    <option>CTA Zandueta</option>
-                    <option>DM Foodmart</option>
-                    <option>CTA Camp 7</option>
-                    <option>BGH - OPD</option>
-                </select>
-            </div>
-        </div>
     </div>
 
     <!-- Branch Cards -->
