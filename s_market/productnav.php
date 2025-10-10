@@ -14,23 +14,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
     $branch = mysqli_real_escape_string($conn, $_POST['branch']);
     $product_type = mysqli_real_escape_string($conn, $_POST['product_type']);
     $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
-    $product_quantity = intval($_POST['product_quantity']);
     $quantity_sold = intval($_POST['quantity_sold']);
     $unit_price = floatval($_POST['unit_price']);
     $total_sales = $quantity_sold * $unit_price;
-    $date_of_sales = mysqli_real_escape_string($conn, $_POST['date_of_sales']);
-    $month_of_sales = mysqli_real_escape_string($conn, $_POST['month_of_sales']);
+    $date_of_sale = mysqli_real_escape_string($conn, $_POST['date_of_sale']);
+    $month_of_sale = mysqli_real_escape_string($conn, $_POST['month_of_sale']);
 
     $sql = "UPDATE product SET 
             branch = '$branch',
             product_type = '$product_type',
             product_name = '$product_name',
-            product_quantity = $product_quantity,
             quantity_sold = $quantity_sold,
             unit_price = $unit_price,
             total_sales = $total_sales,
-            date_of_sales = '$date_of_sales',
-            month_of_sales = '$month_of_sales'
+            date_of_sale = '$date_of_sale',
+            month_of_sale = '$month_of_sale'
             WHERE id = $id";
     
     if (mysqli_query($conn, $sql)) {
@@ -38,6 +36,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($conn);
+    }
+}
+
+// ==============================
+// Handle product addition
+// ==============================
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
+    $branch = mysqli_real_escape_string($conn, $_POST['branch']);
+    $product_type = mysqli_real_escape_string($conn, $_POST['product_type']);
+    $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
+    $quantity_sold = intval($_POST['quantity_sold']);
+    $unit_price = floatval($_POST['unit_price']);
+    $total_sales = $quantity_sold * $unit_price;
+    $date_of_sale = mysqli_real_escape_string($conn, $_POST['date_of_sale']);
+    $month_of_sale = mysqli_real_escape_string($conn, $_POST['month_of_sale']);
+
+    $sql = "INSERT INTO product (branch, product_type, product_name, quantity_sold, unit_price, total_sales, date_of_sale, month_of_sale)
+            VALUES ('$branch', '$product_type', '$product_name', $quantity_sold, $unit_price, $total_sales, '$date_of_sale', '$month_of_sale')";
+    
+    if (mysqli_query($conn, $sql)) {
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        echo "Error adding record: " . mysqli_error($conn);
     }
 }
 
@@ -70,7 +92,6 @@ $summary_sql = "SELECT
     COUNT(*) AS total_products,
     SUM(total_sales) AS total_sales,
     SUM(quantity_sold) AS items_sold,
-    SUM(product_quantity) AS items_in_stock
     FROM product WHERE 1=1";
 
 // Apply same filters
@@ -78,17 +99,14 @@ if ($branchFilter != "All Branches") {
     $summary_sql .= " AND branch = '" . mysqli_real_escape_string($conn, $branchFilter) . "'";
 }
 if (!empty($startDate) && !empty($endDate)) {
-    $summary_sql .= " AND date_of_sales BETWEEN '" . mysqli_real_escape_string($conn, $startDate) . "' 
+    $summary_sql .= " AND date_of_sale BETWEEN '" . mysqli_real_escape_string($conn, $startDate) . "' 
                       AND '" . mysqli_real_escape_string($conn, $endDate) . "'";
 }
 
-$summary_result = mysqli_query($conn, $summary_sql);
-$summary = mysqli_fetch_assoc($summary_result);
 
 $total_products = $summary['total_products'] ?? 0;
 $total_sales = $summary['total_sales'] ?? 0;
 $items_sold = $summary['items_sold'] ?? 0;
-$items_in_stock = $summary['items_in_stock'] ?? 0;
 
 // ==============================
 // Product Table Query
@@ -102,7 +120,7 @@ if ($branchFilter != "All Branches") {
 
 // Date filter
 if (!empty($startDate) && !empty($endDate)) {
-    $sql .= " AND date_of_sales BETWEEN '" . mysqli_real_escape_string($conn, $startDate) . "' 
+    $sql .= " AND date_of_sale BETWEEN '" . mysqli_real_escape_string($conn, $startDate) . "' 
               AND '" . mysqli_real_escape_string($conn, $endDate) . "'";
 }
 
@@ -116,7 +134,7 @@ if (isset($_GET['export_csv'])) {
     header('Content-Disposition: attachment; filename="products.csv"');
 
     $output = fopen('php://output', 'w');
-    fputcsv($output, ['Branch', 'Product Type', 'Product Name', 'Stock', 'Quantity Sold', 'Unit Price', 'Total Sales', 'Date of Sales', 'Month of Sales']);
+    fputcsv($output, ['Branch', 'Product Type', 'Product Name', 'Quantity Sold', 'Unit Price', 'Total Sales', 'Date of Sales', 'Month of Sales']);
 
     if ($result && mysqli_num_rows($result) > 0) {
         mysqli_data_seek($result, 0);
@@ -134,8 +152,8 @@ if (isset($_GET['export_csv'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-Market - Products</title>
-    <link rel="stylesheet" href="productnav.css">
-    <link rel="stylesheet" href="producttest.css">
+    <link rel="stylesheet" href="newprodnav.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -157,25 +175,7 @@ if (isset($_GET['export_csv'])) {
         <!-- Main Content Area -->
         <div class="main-content">
 
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="card">
-                    <h3><?= $total_products ?></h3>
-                    <p>Total Products</p>
-                </div>
-                <div class="card">
-                    <h3>₱<?= number_format($total_sales, 2) ?></h3>
-                    <p>Total Sales</p>
-                </div>
-                <div class="card">
-                    <h3><?= $items_sold ?></h3>
-                    <p>Items Sold</p>
-                </div>
-                <div class="card">
-                    <h3><?= $items_in_stock ?></h3>
-                    <p>Items in Stock</p>
-                </div>
-            </div>
+            
 
             <!-- Active Filters Info -->
             <div class="filter-info">
@@ -213,13 +213,13 @@ if (isset($_GET['export_csv'])) {
                     </div>
                 </div>
                 
+                <!-- Product Table -->
                 <table class="products-table">
                     <thead>
                         <tr>
                             <th>Branch</th>
                             <th>Product Type</th>
                             <th>Product Name</th>
-                            <th>Stock</th>
                             <th>Quantity Sold</th>
                             <th>Unit Price</th>
                             <th>Total Sales</th>
@@ -236,12 +236,11 @@ if (isset($_GET['export_csv'])) {
                                 echo "<td>" . htmlspecialchars($row['branch']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['product_type']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['product_name']) . "</td>";
-                                echo "<td>" . intval($row['product_quantity']) . "</td>";
                                 echo "<td>" . intval($row['quantity_sold']) . "</td>";
                                 echo "<td>₱" . number_format($row['unit_price'], 2) . "</td>";
                                 echo "<td>₱" . number_format($row['total_sales'], 2) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['date_of_sales']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['month_of_sales']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['date_of_sale']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['month_of_sale']) . "</td>";
                                 echo "<td>
                                         <button class='action-btn edit-btn' onclick='editProduct(" . json_encode($row) . ")'><i class='fas fa-edit'></i></button>
                                         <form method='POST' style='display:inline;'>
@@ -257,34 +256,48 @@ if (isset($_GET['export_csv'])) {
                         ?>
                     </tbody>
                 </table>
+
+                <!-- Floating Add Product Button -->
+                <div class="add-product-btn">
+                    <button type="button" onclick="openAddModal()">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Edit Product Modal -->
+
+    <!-- Edit/Add Product Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h3>Edit Product</h3>
+            <h3 id="modalTitle">Edit Product</h3>
             <form id="editProductForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <input type="hidden" id="edit_id" name="id">
-
+                
                 <div class="form-group">
                     <label for="edit_branch">Branch</label>
-                    <input type="text" id="edit_branch" name="branch" required>
+                    <select id="edit_branch" name="branch" required>
+                        <option value="">Select Branch</option>
+                        <option value="CTA Zandueta">CTA Zandueta</option>
+                        <option value="DM Foodmart">DM Foodmart</option>
+                        <option value="CTA Camp7">CTA Camp7</option>
+                        <option value="BGH-OPD">BGH-OPD</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_product_type">Product Type</label>
-                    <input type="text" id="edit_product_type" name="product_type" required>
+                    <select id="edit_product_type" name="product_type" required>
+                        <option value="">Select Product Type</option>
+                        <option value="Big Tub">Big Tub</option>
+                        <option value="Small Tub">Small Tub</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_product_name">Product Name</label>
                     <input type="text" id="edit_product_name" name="product_name" required>
                 </div>
-                <div class="form-group">
-                    <label for="edit_product_quantity">Stock</label>
-                    <input type="number" id="edit_product_quantity" name="product_quantity" required>
-                </div>
+                
                 <div class="form-group">
                     <label for="edit_quantity_sold">Quantity Sold</label>
                     <input type="number" id="edit_quantity_sold" name="quantity_sold" required>
@@ -294,27 +307,95 @@ if (isset($_GET['export_csv'])) {
                     <input type="number" id="edit_unit_price" name="unit_price" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label for="edit_date_of_sales">Date of Sales</label>
-                    <input type="date" id="edit_date_of_sales" name="date_of_sales" required>
+                    <label for="edit_date_of_sale">Date of Sales</label>
+                    <input type="date" id="edit_date_of_sale" name="date_of_sale" required>
                 </div>
                 <div class="form-group">
-                    <label for="edit_month_of_sales">Month of Sales</label>
-                    <input type="text" id="edit_month_of_sales" name="month_of_sales" required>
+                    <label for="edit_month_of_sale">Month of Sales</label>
+                    <input type="text" id="edit_month_of_sale" name="month_of_sale" required>
                 </div>
 
                 <div class="btn-container">
                     <button type="button" class="btn" onclick="closeModal()">Cancel</button>
-                    <button type="submit" name="update_product" class="btn btn-primary">Save Changes</button>
+                    <button type="submit" name="update_product" class="btn btn-primary" id="modalSubmitBtn">Save Product</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="productnav.js"></script>
+    <script>
+    // Modal functions
+    function openAddModal() {
+        const modal = document.getElementById("editModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const form = document.getElementById("editProductForm");
+        const submitBtn = document.getElementById("modalSubmitBtn");
+        
+        if (!modal || !modalTitle || !form || !submitBtn) {
+            console.error("Modal elements not found!");
+            return;
+        }
+        
+        form.reset();
+        document.getElementById("edit_id").value = "";
+        
+        modalTitle.textContent = "Add New Product";
+        submitBtn.name = "add_product";
+        submitBtn.textContent = "Add Product";
+        modal.style.display = "block";
+    }
+
+    function editProduct(product) {
+        const modal = document.getElementById("editModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const submitBtn = document.getElementById("modalSubmitBtn");
+        
+        if (!modal || !modalTitle || !submitBtn) {
+            console.error("Modal elements not found!");
+            return;
+        }
+        
+        const setValue = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) element.value = value;
+        };
+        
+        setValue("edit_id", product.id);
+        setValue("edit_branch", product.branch);
+        setValue("edit_product_type", product.product_type);
+        setValue("edit_product_name", product.product_name);
+        setValue("edit_quantity_sold", product.quantity_sold);
+        setValue("edit_unit_price", product.unit_price);
+        setValue("edit_date_of_sale", product.date_of_sale);
+        setValue("edit_month_of_sale", product.month_of_sale);
+        
+        modalTitle.textContent = "Edit Product";
+        submitBtn.name = "update_product";
+        submitBtn.textContent = "Save Changes";
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("editModal");
+        if (modal) modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById("editModal");
+        if (modal && event.target == modal) {
+            closeModal();
+        }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') closeModal();
+    });
+    </script>
+
 </body>
 </html>
 <?php
 mysqli_close($conn);
 ?>
-try
