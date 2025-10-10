@@ -1,0 +1,731 @@
+/* =========================
+   Global Variables
+========================= */
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --text: #333;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    /* Chart Colors */
+    --chart-blue: #3498db;
+    --chart-green: #2ecc71;
+    --chart-orange: #e67e22;
+    --chart-indigo: #9b59b6;
+}
+
+/* =========================
+   Reset & Base Styles
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* =========================
+   Main Layout
+========================= */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* =========================
+   Sidebar Navigation
+========================= */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary);
+    color: white;
+    padding: 2rem 0;
+    transition: all 0.3s ease;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.logo {
+    padding: 0 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+}
+
+.logo img {
+    width: 40px;
+    margin-right: 10px;
+}
+
+.logo h2 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-item {
+    padding: 0.8rem 1.5rem;
+    margin: 0.2rem 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.nav-item.active {
+    background-color: var(--secondary);
+    border-left: 4px solid white;
+}
+
+.nav-item:hover {
+    background-color: rgba(52, 152, 219, 0.5);
+}
+
+.nav-item i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.nav-item a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================
+   Main Content Area
+========================= */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background: transparent;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 500px;
+    position: relative;
+    margin-right: 2rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.search-bar i {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+/* =========================
+   Profile Menu Styles
+========================= */
+.profile-menu {
+    position: relative;
+}
+
+.profile-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.profile-toggle:hover {
+    background: #f8f9fa;
+}
+
+.profile-toggle .avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--secondary);
+}
+
+.username {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 1.25rem;
+    min-width: 240px;
+    display: none;
+    z-index: 1000;
+    border: 1px solid #e9ecef;
+}
+
+.profile-menu:hover .dropdown {
+    display: block;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.profile-info .avatar {
+    width: 55px;
+    height: 55px;
+}
+
+.profile-info strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--dark);
+}
+
+.email {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.dropdown hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid #e9ecef;
+}
+
+.dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    padding-left: 0.5rem;
+}
+
+.dropdown a:hover {
+    color: var(--secondary);
+    background: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.dropdown a.logout {
+    color: var(--accent);
+}
+
+.dropdown a.logout:hover {
+    color: #c0392b;
+    background: #fee;
+}
+
+/* =========================
+   KPI Dashboard
+========================= */
+.kpi-dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    border-top: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-card.revenue {
+    border-top-color: #3498db;
+    background: linear-gradient(135deg, #fff 0%, #f8fbfd 100%);
+}
+
+.kpi-card.profit {
+    border-top-color: #2ecc71;
+    background: linear-gradient(135deg, #fff 0%, #f8fdf9 100%);
+}
+
+.kpi-card.margin {
+    border-top-color: #9b59b6;
+    background: linear-gradient(135deg, #fff 0%, #fbf8fd 100%);
+}
+
+.kpi-card.performance {
+    border-top-color: #e67e22;
+    background: linear-gradient(135deg, #fff 0%, #fefaf6 100%);
+}
+
+.kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.kpi-title {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-icon.revenue { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+.kpi-icon.profit { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+.kpi-icon.margin { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+.kpi-icon.performance { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); }
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.kpi-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-trend.positive {
+    color: var(--success);
+}
+
+.kpi-trend.negative {
+    color: var(--accent);
+}
+
+.kpi-subtitle {
+    font-size: 0.8rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+/* =========================
+   Branch Analytics Section
+========================= */
+.branch-analytics-container {
+    background: #ffffff;
+    border: 1px solid #e1e8ed;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.branch-analytics-container:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.branch-analytics-header {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+}
+
+.section-title .icon {
+    color: var(--secondary);
+    font-size: 1.3rem;
+}
+
+/* Branch Cards Grid */
+.branch-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+/* Branch Card */
+.branch-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #e1e8ed;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.branch-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border-color: var(--secondary);
+}
+
+.branch-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.branch-name {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+/* Dynamic Branch Dots */
+.branch-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid white;
+}
+
+.branch-color.green   { background: var(--success); }
+.branch-color.yellow  { background: var(--warning); }
+.branch-color.orange  { background: var(--chart-orange); }
+.branch-color.red     { background: var(--accent); }
+
+/* Stats */
+.branch-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.stat-value.positive { 
+    color: var(--success);
+    font-weight: 700;
+}
+
+.stat-value.negative { 
+    color: var(--accent);
+    font-weight: 700;
+}
+
+/* =========================
+   Sales Report Section
+========================= */
+.sales-report-container {
+    background: #ffffff;
+    border: 1px solid #e1e8ed;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    border: 2px solid #e9ecef;
+    background: white;
+    font-size: 0.95rem;
+    appearance: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    min-width: 180px;
+}
+
+.select-wrapper select:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.select-wrapper::after {
+    content: '▼';
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+    font-size: 0.8rem;
+}
+
+.report-charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+}
+
+.chart-block {
+    margin-bottom: 1rem;
+}
+
+.chart-title {
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.chart-container {
+    height: 300px;
+    position: relative;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+/* Chart.js Canvas Styling */
+.chart-container canvas {
+    border-radius: var(--border-radius);
+}
+
+/* =========================
+   Remove Old Styles
+========================= */
+.dashboard-grid {
+    display: none !important;
+}
+
+.metric-card {
+    display: none !important;
+}
+
+/* =========================
+   Responsive Design
+========================= */
+@media (max-width: 1200px) {
+    .kpi-dashboard,
+    .branch-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        position: relative;
+    }
+    
+    .nav-links {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .nav-item {
+        padding: 0.75rem 1rem;
+        margin: 0 0.5rem;
+        white-space: nowrap;
+        border-left: none;
+    }
+    
+    .nav-item.active {
+        border-left: none;
+        border-bottom: 3px solid white;
+    }
+    
+    .kpi-dashboard,
+    .branch-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-bar {
+        max-width: 100%;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-menu {
+        align-self: flex-end;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .select-wrapper {
+        width: 100%;
+    }
+    
+    .select-wrapper select {
+        width: 100%;
+    }
+    
+    .branch-analytics-container,
+    .sales-report-container {
+        padding: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .kpi-value {
+        font-size: 1.6rem;
+    }
+    
+    .kpi-card {
+        padding: 1.25rem;
+    }
+    
+    .header {
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .report-charts {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* =========================
+   Animations
+========================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.branch-analytics-container,
+.sales-report-container,
+.kpi-dashboard {
+    animation: fadeInUp 0.6s ease-out;
+}
