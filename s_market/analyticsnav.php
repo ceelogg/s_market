@@ -14,90 +14,155 @@ mysqli_close($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-Market - Analytics</title>
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="analyticscss.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        background-color: #f4f6f8;
-    }
-
-    .container {
-        display: flex;
-        height: 50vh;
-        width: 110vw;
-        overflow: hidden;
-    }
-
-
-    .main-content {
-        flex-grow: 5;
-        display: flex;
-        justify-content: center;  /* Centers the analytics horizontally */
-        align-items: center;      /* Centers it vertically */
-        background-color: #f4f6f8;
-        padding: 0;
-    }
-
-    .chart-title {
-        display: none; /* hide title to give full space to Power BI */
-    }
-
-    .powerbi-container {
-        width: 95%;      /* makes report centered with slight margins */
-        height: 95vh;    /* fills most of the viewport height */
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    /* Optional: make iframe adjust well on smaller screens */
-    @media (max-width: 1000px) {
-        .powerbi-container {
-            width: 100%;
-            height: 90vh;
-        }
-    }
-</style>
-
+    <link rel="stylesheet" href="AnalyticsCSStesing.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
 
-<div class="container">
-    <div class="sidebar">
-        <div class="logo">
-            <img src="logo.png" alt="S-Market Logo">
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="analytics-container">
+        <!-- Sidebar Navigation -->   
+
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="S-Market Logo">
             <h2>S-Market</h2>
+    </div>
+    <ul class="nav-links">
+        <li class="nav-item"><a href="userpage.php"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="productnav.php"><i class="fas fa-box"></i> <span>Products</span></a></li>
+        <li class="nav-item active"><a href="analyticsnav.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
+        <li class="nav-item"><a href="AiRecnav.php"><i class="fas fa-lightbulb"></i> <span>AI Recommendations</span></a></li>
+        <li class="nav-item"><a href="#"><i class="fas fa-bullhorn"></i> <span>Marketing</span></a></li>
+        <li class="nav-item"><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+    </ul>
+</div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
+                <div class="header-controls">
+                    <div class="date-filter">
+                        <span>Period:</span>
+                        <select>
+                            <option>Last 7 days</option>
+                            <option selected>Last 30 days</option>
+                            <option>Last 90 days</option>
+                            <option>Year to date</option>
+                        </select>
+                    </div>
+                    <button class="export-btn">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Sales</h3>
+                        <div class="stat-value">$30.19K</div>
+                        <div class="stat-trend positive">+12.5%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Items Sold</h3>
+                        <div class="stat-value">1,143</div>
+                        <div class="stat-trend positive">+8.3%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Capital</h3>
+                        <div class="stat-value">$247.24K</div>
+                        <div class="stat-trend negative">-2.1%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Profit</h3>
+                        <div class="stat-value">$30.19K</div>
+                        <div class="stat-trend positive">+15.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power BI Report Container -->
+            <div class="powerbi-section">
+                <div class="section-header">
+                    <h2>Interactive Sales Analytics</h2>
+                    <div class="section-actions">
+                        <button class="refresh-btn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="powerbi-container">
+                    <iframe 
+                        src="https://app.powerbi.com/reportEmbed?reportId=8a970f37-63b7-49bb-b876-a0a2d44006f9&autoAuth=true&ctid=230efac0-932f-4bb5-ab75-fbd736b468f9&navContentPaneEnabled=false&filterPaneEnabled=false" 
+                        allowFullScreen="true">
+                    </iframe>
+                </div>
+            </div>
         </div>
-        <ul class="nav-links">
-            <li class="nav-item"><a href="userpage.php"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li class="nav-item"><a href="productnav.php"><i class="fas fa-box"></i> Products</a></li>
-            <li class="nav-item active"><i class="fas fa-chart-bar"></i> Analytics</li>
-            <li class="nav-item"><a href="AiRecnav.php"><i class="fas fa-lightbulb"></i> AI Recommendations</a></li>
-            <li class="nav-item"><i class="fas fa-bullhorn"></i> Marketing</li>
-            <li class="nav-item"><i class="fas fa-cog"></i> Settings</li>
-        </ul>
     </div>
 
-    <!-- Power BI Embedded Report -->
-    
-      <div class="main-content">
-    <iframe 
-        class="powerbi-container"
-        src="https://app.powerbi.com/reportEmbed?reportId=8a970f37-63b7-49bb-b876-a0a2d44006f9&autoAuth=true&ctid=230efac0-932f-4bb5-ab75-fbd736b468f9&navContentPaneEnabled=false&filterPaneEnabled=false" 
-        allowFullScreen="true">
-    </iframe>
-</div>
+    <script>
+        // Mobile sidebar functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const mobileOverlay = document.getElementById('mobileOverlay');
 
-    </div>
-</div>
+        function toggleSidebar() {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+            document.body.classList.toggle('sidebar-open');
+        }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        mobileMenuToggle.addEventListener('click', toggleSidebar);
+        sidebarClose.addEventListener('click', toggleSidebar);
+        mobileOverlay.addEventListener('click', toggleSidebar);
 
+        // Close sidebar when clicking on nav links (mobile)
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+    </script>
 </body>
 </html>
