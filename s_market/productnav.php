@@ -1,7 +1,8 @@
+
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "";
+$password = "smarket"; 
 $database = "s_market";  
 
 $conn = mysqli_connect($servername, $username, $password, $database);
@@ -169,25 +170,14 @@ if (isset($_GET['export_csv'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-Market - Products</title>
-    <link rel="stylesheet" href="newprodnav.css">
+    <link rel="stylesheet" href="productnavcss.css">
+    <link rel="stylesheet" href="airecnav.css"> <!-- Global sidebar styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="logo">
-                <img src="logo.png" alt="S-Market Logo">
-                <h2>S-Market</h2>
-            </div>
-            <ul class="nav-links">
-                <li class="nav-item"><a href="userpage.php"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li class="nav-item active"><a href="productnav.php"><i class="fas fa-box"></i> Products</a></li>
-                <li class="nav-item"><a href="analyticsnav.php"><i class="fas fa-chart-bar"></i> Analytics</a></li>
-                <li class="nav-item"><a href="AiRecnav.php"><i class="fas fa-lightbulb"></i> AI Recommendations</a></li>
-                <li class="nav-item"><i class="fas fa-bullhorn"></i> Marketing</li>
-                <li class="nav-item"><i class="fas fa-cog"></i> Settings</li>
-            </ul>
-        </div>
+        <!-- Global Sidebar -->
+        <?php include 'globalsidebar.php'; ?>
         
         <!-- Main Content Area -->
         <div class="main-content">
@@ -379,7 +369,7 @@ if (isset($_GET['export_csv'])) {
     </div>
 
     <!-- Include the external JavaScript file -->
-    <script src="productnav.js"></script>
+<script src="productnav.js?v=1" defer></script>
 
 </body>
 </html>
