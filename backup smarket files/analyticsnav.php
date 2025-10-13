@@ -1,168 +1,108 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "";
+$password = "smarket";
 $database = "s_market";
-
 $conn = mysqli_connect($servername, $username, $password, $database);
 mysqli_close($conn);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S-Market - Analytics</title>
-    <link rel="stylesheet" href="AnalyticsCSStesing.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>S-Market - Analytics</title>
+<link rel="stylesheet" href="newdashboard.css">
+<link rel="stylesheet" href="globalsidebar.css">
+
+<style>
+  html, body { margin:0; height:100%; overflow:hidden; background:#0f172a; }
+
+  /* Layout container */
+  .layout { height:100vh; width:100vw; }
+
+  /* Keep your sidebar styling as-is; we’ll measure it and offset the content */
+  .sidebar { /* your existing styles in dashboard.css */ }
+
+  /* The area the iframe will fill */
+  .report-area {
+    position: fixed;         /* sit beside a fixed/absolute sidebar */
+    top: 0;
+    right: 0;
+    height: 100vh;
+    /* left is set by JS to match sidebar width */
+    background:#2C3E50;      /* same dark bg as report edges */
+    overflow: hidden;
+  }
+
+  /* The Power BI iframe */
+  .powerbi {
+  width: 99%;
+  height: 100.5%;
+  border: 4px solid #2C3E50;  /* ✅ visible dark blue-gray border */
+  border-radius: 5px;         /* optional: slightly rounded corners */
+  display: block;
+  box-sizing: border-box;    /* keeps the border from affecting layout */
+}
+  
+</style>
 </head>
 <body>
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
-    </button>
 
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-
-    <div class="analytics-container">
-        <!-- Sidebar Navigation -->   
-
-        <div class="sidebar" id="sidebar">
-            <div class="logo">
-                <img src="logo.png" alt="S-Market Logo">
-            <h2>S-Market</h2>
+<div class="layout">
+  <!-- Your sidebar (unchanged markup/styles) -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="logo.png" alt="S-Market Logo">
+      <h2>S-Market</h2>
     </div>
     <ul class="nav-links">
-        <li class="nav-item"><a href="userpage.php"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-        <li class="nav-item"><a href="productnav.php"><i class="fas fa-box"></i> <span>Products</span></a></li>
-        <li class="nav-item active"><a href="analyticsnav.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
-        <li class="nav-item"><a href="AiRecnav.php"><i class="fas fa-lightbulb"></i> <span>AI Recommendations</span></a></li>
-        <li class="nav-item"><a href="#"><i class="fas fa-bullhorn"></i> <span>Marketing</span></a></li>
-        <li class="nav-item"><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+      <li class="nav-item"><a href="userpage.php"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li class="nav-item"><a href="productnav.php"><i class="fas fa-box"></i> Products</a></li>
+      <li class="nav-item active"><a href="analyticsnav.php"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+      <li class="nav-item"><a href="AiRecnav.php"><i class="fas fa-lightbulb"></i> AI Recommendations</a></li>
+      <li class="nav-item"><a href="userpage.php"><i class="fas fa-bullhorn"></i> Marketing</a></a></li>
+      <li class="nav-item"><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
     </ul>
+  </div>
+
+  <!-- Report fills the remaining space exactly -->
+  <div id="reportArea" class="report-area">
+    <iframe
+      class="powerbi"
+      src="https://app.powerbi.com/reportEmbed?reportId=8a970f37-63b7-49bb-b876-a0a2d44006f9&autoAuth=true&ctid=230efac0-932f-4bb5-ab75-fbd736b468f9&filterPaneEnabled=true&navContentPaneEnabled=false&bookmarkPaneEnabled=false&pageView=FitToWidth"
+      allowfullscreen="true"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">
+    </iframe>
+  </div>
 </div>
 
-        <!-- Main Content Area -->
-        <div class="main-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
-                <div class="header-controls">
-                    <div class="date-filter">
-                        <span>Period:</span>
-                        <select>
-                            <option>Last 7 days</option>
-                            <option selected>Last 30 days</option>
-                            <option>Last 90 days</option>
-                            <option>Year to date</option>
-                        </select>
-                    </div>
-                    <button class="export-btn">
-                        <i class="fas fa-download"></i> Export Report
-                    </button>
-                </div>
-            </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-            <!-- Quick Stats -->
-            <div class="quick-stats">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Sales</h3>
-                        <div class="stat-value">$30.19K</div>
-                        <div class="stat-trend positive">+12.5%</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Items Sold</h3>
-                        <div class="stat-value">1,143</div>
-                        <div class="stat-trend positive">+8.3%</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Capital</h3>
-                        <div class="stat-value">$247.24K</div>
-                        <div class="stat-trend negative">-2.1%</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-pie"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Profit</h3>
-                        <div class="stat-value">$30.19K</div>
-                        <div class="stat-trend positive">+15.2%</div>
-                    </div>
-                </div>
-            </div>
+<script>
+  // Fit the report area to the exact width remaining beside the sidebar
+  (function fitToSidebar(){
+    const sidebar = document.querySelector('.sidebar');
+    const report  = document.getElementById('reportArea');
 
-            <!-- Power BI Report Container -->
-            <div class="powerbi-section">
-                <div class="section-header">
-                    <h2>Interactive Sales Analytics</h2>
-                    <div class="section-actions">
-                        <button class="refresh-btn">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                </div>
-                <div class="powerbi-container">
-                    <iframe 
-                        src="https://app.powerbi.com/reportEmbed?reportId=8a970f37-63b7-49bb-b876-a0a2d44006f9&autoAuth=true&ctid=230efac0-932f-4bb5-ab75-fbd736b468f9&navContentPaneEnabled=false&filterPaneEnabled=false" 
-                        allowFullScreen="true">
-                    </iframe>
-                </div>
-            </div>
-        </div>
-    </div>
+    function sync(){
+      if(!sidebar || !report) return;
+      const w = sidebar.getBoundingClientRect().width || 0;
+      report.style.left  = w + 'px';
+      report.style.width = `calc(100vw - ${w}px)`;
+    }
 
-    <script>
-        // Mobile sidebar functionality
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarClose = document.getElementById('sidebarClose');
-        const mobileOverlay = document.getElementById('mobileOverlay');
+    window.addEventListener('load', sync);
+    window.addEventListener('resize', sync);
 
-        function toggleSidebar() {
-            sidebar.classList.toggle('mobile-open');
-            mobileOverlay.classList.toggle('active');
-            document.body.classList.toggle('sidebar-open');
-        }
+    // If the sidebar width changes (collapse/expand), keep in sync
+    let prev = 0;
+    setInterval(() => {
+      const w = sidebar ? sidebar.getBoundingClientRect().width : 0;
+      if (w !== prev){ prev = w; sync(); }
+    }, 250);
+  })();
+</script>
 
-        mobileMenuToggle.addEventListener('click', toggleSidebar);
-        sidebarClose.addEventListener('click', toggleSidebar);
-        mobileOverlay.addEventListener('click', toggleSidebar);
-
-        // Close sidebar when clicking on nav links (mobile)
-        document.querySelectorAll('.nav-item a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    toggleSidebar();
-                }
-            });
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('mobile-open');
-                mobileOverlay.classList.remove('active');
-                document.body.classList.remove('sidebar-open');
-            }
-        });
-    </script>
 </body>
 </html>
