@@ -1,0 +1,124 @@
+/* =========================
+   Global Sidebar Styles Only
+========================= */
+:root {
+    --sidebar-bg: #0d1b2a;
+    --sidebar-text: #e5e7eb;
+    --sidebar-active: rgba(255,255,255,.08);
+    --sidebar-width: 280px;
+}
+
+/* Sidebar Layout */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 24px 18px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.sidebar .logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+}
+
+.sidebar .logo h2 {
+    color: white;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.sidebar .nav-links {
+    list-style: none;
+    flex: 1;
+}
+
+.sidebar .nav-item {
+    margin: 4px 0;
+}
+
+.sidebar .nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.sidebar .nav-item a:hover,
+.sidebar .nav-item.active a {
+    background: var(--sidebar-active);
+}
+
+.sidebar .nav-item i {
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar .sidebar-footer {
+    margin-top: auto;
+    opacity: .85;
+    font-size: 12px;
+    padding: 16px 8px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Container layout for sidebar */
+.container-with-sidebar {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Main content area when using sidebar */
+.main-content-with-sidebar {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+    .container-with-sidebar {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        position: static;
+        height: auto;
+        width: 100%;
+    }
+    
+    .sidebar .nav-links {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .sidebar .nav-item {
+        padding: 0.75rem 1rem;
+        margin: 0 0.5rem;
+        white-space: nowrap;
+        border-left: none;
+    }
+    
+    .sidebar .nav-item.active {
+        border-left: none;
+        border-bottom: 3px solid white;
+    }
+}
