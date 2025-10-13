@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Advisor Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7fc;
+        }
+
+        .chat-container {
+            width: 400px;
+            max-width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-box {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            height: 500px;
+        }
+
+        .chat-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+
+        .chat-message.ai {
+            background-color: #e4f5fc;
+            align-self: flex-start;
+        }
+
+        .chat-message.user {
+            background-color: #d0e6ff;
+            align-self: flex-end;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 15px;
+            background-color: #f1f1f1;
+        }
+
+        .input-area input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-area button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .input-area button:hover {
+            background-color: #0056b3;
+        }
+
+        .loading {
+            font-size: 16px;
+            color: #007bff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- Chat messages will appear here -->
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Ask for market trends or advice..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+
+        // Predefined AI responses
+        const aiResponses = [
+            "Based on current trends, increasing your social media presence is a great strategy!",
+            "Targeting mobile users has proven to significantly improve conversion rates in recent campaigns.",
+            "PPC spend could be optimized by focusing on high-performing keywords for your niche.",
+            "It's crucial to track competitors in your market to understand where you can gain a competitive edge.",
+            "Have you considered using influencers to expand your brand's reach? It’s a growing trend in many industries.",
+            "Expanding to new platforms could be a smart move. Many brands are seeing success with TikTok campaigns."
+        ];
+
+        function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            if (userInput.trim() === "") return; // Don't send empty messages
+
+            // Display user message
+            displayMessage(userInput, 'user');
+            document.getElementById('user-input').value = ""; // Clear input field
+
+            // Simulate AI response after a delay
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+            setTimeout(() => {
+                const aiMessage = getAIResponse();
+                displayMessage(aiMessage, 'ai');
+                chatBox.scrollTop = chatBox.scrollHeight; // Keep scrolled to the bottom
+            }, 1000);
+        }
+
+        function displayMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', sender);
+            messageDiv.textContent = message;
+            chatBox.appendChild(messageDiv);
+        }
+
+        function getAIResponse() {
+            // Randomly select a predefined response
+            const randomIndex = Math.floor(Math.random() * aiResponses.length);
+            return aiResponses[randomIndex];
+        }
+
+        // Initial greeting message from AI
+        window.onload = () => {
+            displayMessage("Hello! I am your Market Advisor. Ask me about market trends or strategies.", 'ai');
+        };
+    </script>
+
+</body>
+</html>
